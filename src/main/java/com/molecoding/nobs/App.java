@@ -39,16 +39,17 @@ public class App {
     return BaseEncoding.base16().encode(encrypt(bytes, keyHex));
   }
 
-  public String decrypt(String encryptedHex, String key) throws Exception {
-    SecretKey secretKey = secretKey(key);
+  public byte[] decrypt(byte[] msgBytes, String keyHex) throws Exception {
     Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+    desCipher.init(Cipher.DECRYPT_MODE, secretKey(keyHex));
 
-    byte[] encrypted = BaseEncoding.base16().decode(encryptedHex);
+    return desCipher.doFinal(msgBytes);
+  }
 
-    desCipher.init(Cipher.DECRYPT_MODE, secretKey);
-    byte[] decrypted = desCipher.doFinal(encrypted);
+  public String decrypt(String encryptedHex, String keyHex) throws Exception {
+    byte[] bytes = BaseEncoding.base16().decode(encryptedHex);
 
-    return BaseEncoding.base16().encode(decrypted);
+    return BaseEncoding.base16().encode(decrypt(bytes, keyHex));
   }
 
 

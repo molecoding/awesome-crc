@@ -1,6 +1,7 @@
 package com.molecoding.nobs;
 
 import com.google.common.io.BaseEncoding;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,5 +119,22 @@ public class AppTest {
     ).replace(" ", "")));
     System.out.println(data);
     assertEquals(expected, new App().encrypt(data, key));
+  }
+
+
+  @Test
+  public void testMoreCodec() throws Exception {
+    String keyHex = "0C0F070C040E0E06";
+    String dataHex = "01001302000100018986040410204000438217000800200A8C6D000000000000";
+
+    byte[] data = BaseEncoding.base16().decode(dataHex);
+    byte[] encrypted = new App().encrypt(data, keyHex);
+    String encryptedHex = BaseEncoding.base16().encode(encrypted);
+    System.out.printf("encrypted: %s\n", encryptedHex);
+
+    String decryptedHex = new App().decrypt(encryptedHex, keyHex);
+    System.out.printf("decrypted: %s\n", decryptedHex);
+
+    assertThat(dataHex).isEqualTo(decryptedHex);
   }
 }
