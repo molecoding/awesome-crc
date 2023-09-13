@@ -3,8 +3,8 @@ package com.molecoding.nobs;
 import com.google.common.io.BaseEncoding;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * Unit test for simple App.
@@ -26,7 +26,7 @@ public class AppTest {
       "00" + // ord
       "251241BE4F9C8A26" // data encrypted
       ;
-    assertEquals("72A4", new App().crc(hex));
+    assertThat(new App().crc(hex)).isEqualTo("72A4");
   }
 
   @Test
@@ -38,6 +38,16 @@ public class AppTest {
     String encryptedHex = "DB38E7C03C539B77";
     assertEquals(encryptedHex, new App().encrypt(data, key));
   }
+
+  @Test
+  public void testEncrypt_withDataPadding_shouldOk() throws Exception {
+    String keyHex = "0C 0F 07 0C 04 0E 0E 06".replace(" ", "");
+    String data1 = new String(new char[]{0x01, 0x02, 0x03});
+    String data2 = new String(new char[]{0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00});
+
+    assertNotEquals(new App().encrypt(data1, keyHex), new App().encrypt(data2, keyHex));
+  }
+
 
   @Test
   public void testEncrypt_withPadding_shouldOk() throws Exception {
@@ -84,7 +94,6 @@ public class AppTest {
         "00 00 00 00 00 00 00 00").replace(" ", "");
     assertEquals(expected, new App().decrypt(data, key));
   }
-
 
   //  @Test
   public void testEncrypt2_shouldOk() throws Exception {
