@@ -34,11 +34,19 @@ public class AppTest {
     String key = "0C 0F 07 0C 04 0E 0E 06".replace(" ", "");
     String data = new String(new char[]{0x01, 0x02, 0x03});
 
-    String expected = "251241BE4F9C8A2641BD80B10BB828E0";
-    assertEquals(expected, new App().encrypt(data, key));
+//    String expected = "251241BE4F9C8A2641BD80B10BB828E0";
+    String encryptedHex = "DB38E7C03C539B77";
+    assertEquals(encryptedHex, new App().encrypt(data, key));
+  }
 
-    int paddingLen = data.length() + (data.length() % 8 == 0 ? 0 : (8 - data.length() % 8));
-    assertEquals("251241BE4F9C8A26", new App().encrypt(data, key).substring(0, paddingLen * 2));
+  @Test
+  public void testEncrypt_withPadding_shouldOk() throws Exception {
+    String key = "0C 0F 07 0C 04 0E 0E 06".replace(" ", "");
+    String data = new String(new char[]{0x01, 0x02, 0x03});
+
+    String paddedHex = new String(App.padding(data.getBytes()));
+    assertEquals("251241BE4F9C8A26",
+      new App().encrypt(paddedHex, key).substring(0, paddedHex.length() * 2));
   }
 
 

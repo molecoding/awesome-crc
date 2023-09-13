@@ -14,34 +14,33 @@ public class App {
     System.out.println("Hello World!");
   }
 
-  SecretKey key(String keyHex) throws Exception {
+  SecretKey secretKey(String keyHex) throws Exception {
     byte[] keyBytes = BaseEncoding.base16().decode(keyHex.toUpperCase());
 
     return SecretKeyFactory.getInstance("DES").generateSecret(new DESKeySpec(keyBytes));
   }
 
-  byte[] padding(byte[] bytes) {
+  public static byte[] padding(byte[] bytes) {
     int len = bytes.length + (bytes.length % 8 == 0 ? 0 : (8 - bytes.length % 8));
     System.out.printf("padding %d to %d\n", bytes.length, len);
     return Arrays.copyOf(bytes, len);
   }
 
-  public String encrypt(String message, String keyHex) throws Exception {
-    byte[] bytes = padding(message.getBytes());
-    SecretKey secretKey = key(keyHex);
-
-//    IvParameterSpec iv = new IvParameterSpec(keyBytes);
-
+  public byte[] encrypt(byte[] msgBytes, String keyHex) throws Exception {
     Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+    desCipher.init(Cipher.ENCRYPT_MODE, secretKey(keyHex));
 
-    desCipher.init(Cipher.ENCRYPT_MODE, secretKey);
-    byte[] textEncrypted = desCipher.doFinal(bytes);
+    return desCipher.doFinal(msgBytes);
+  }
 
-    return BaseEncoding.base16().encode(textEncrypted);
+  public String encrypt(String message, String keyHex) throws Exception {
+    byte[] bytes = message.getBytes();
+
+    return BaseEncoding.base16().encode(encrypt(bytes, keyHex));
   }
 
   public String decrypt(String encryptedHex, String key) throws Exception {
-    SecretKey secretKey = key(key);
+    SecretKey secretKey = secretKey(key);
     Cipher desCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
 
     byte[] encrypted = BaseEncoding.base16().decode(encryptedHex);
